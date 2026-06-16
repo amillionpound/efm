@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>广东华兴银行 - 银企直联接入指引</title>
+<style>
+  :root {
+    --primary: #1a3c6e;
+    --primary-light: #2a5caa;
+    --accent: #c9a84c;
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #2c2c2c;
+    --text-secondary: #666;
+    --border: #e8eaed;
+    --success: #1a7a3a;
+    --warning: #d48806;
+    --danger: #cf1322;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 200px; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #fff;
+    padding: 28px 20px 24px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(26,60,110,0.15);
+  }
+  .header .bank-name {
+    font-size: 13px;
+    letter-spacing: 3px;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .header .subtitle {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 4px;
+  }
+
+  /* Navigation Tabs */
+  .nav {
+    display: flex;
+    gap: 0;
+    background: #fff;
+    padding: 0;
+    overflow-x: auto;
+    position: sticky;
+    top: 132px;
+    z-index: 99;
+    border-bottom: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display:none; }
+  .nav-item {
+    flex: none;
+    padding: 10px 7px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .nav-item:target,
+  .nav-item.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 600;
+  }
+  .nav-item:active { background: #f0f3f8; }
+  .nav-item:hover { color: var(--primary); }
+
+  /* Main Content */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+  .section { display: none; }
+  .section:target,
+  .section.default { display: block; }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  /* Notice Banner */
+  .notice-banner {
+    background: linear-gradient(135deg, #fff7e6, #fff1cc);
+    border-left: 4px solid var(--warning);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .notice-banner strong { color: var(--warning); font-size: 15px; }
+
+  /* Step Cards */
+  .step {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary-light);
+  }
+  .step .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .step .step-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+  .step p { font-size: 14px; margin-bottom: 8px; color: var(--text-secondary); }
+  .step ul { padding-left: 20px; font-size: 14px; color: var(--text-secondary); }
+  .step ul li { margin-bottom: 4px; }
+  .step .code-block {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    font-family: "SF Mono", "Fira Code", Consolas, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 10px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+  .step .note {
+    background: #e8f5ff;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--primary-light);
+    margin-top: 10px;
+  }
+  .step .warn {
+    background: #fff7e6;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--warning);
+    margin-top: 10px;
+  }
+
+  /* FAQ */
+  .faq-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .faq-q {
+    padding: 16px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    background: var(--card);
+  }
+  .faq-q .arrow {
+    font-size: 12px;
+    transition: transform 0.3s;
+    color: var(--text-secondary);
+  }
+  .faq-item.open .faq-q .arrow { transform: rotate(180deg); color: var(--primary); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+  .faq-a-inner {
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    margin: 0 18px;
+  }
+  .faq-item.open .faq-a { max-height: 800px; }
+
+  /* Q&A Search */
+  .qa-search-box {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .qa-search-box input {
+    width: 100%;
+    padding: 14px 50px 14px 18px;
+    border: 2px solid var(--border);
+    border-radius: 24px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+    background: #fff;
+  }
+  .qa-search-box input:focus { border-color: var(--primary-light); }
+  .qa-search-box button {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    height: 36px;
+    width: 36px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qa-result {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: none;
+    margin-top: 16px;
+  }
+  .qa-result.show { display: block; }
+  .qa-result .result-title { font-size: 15px; font-weight: 600; color: var(--primary); margin-bottom: 10px; }
+  .qa-result .result-content { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+  .qa-result .result-source { font-size: 12px; color: #999; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+  /* Loading dots */
+  .qa-loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  .qa-loading.show { display: block; }
+  .qa-loading .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--primary-light); margin: 0 3px; animation: dotBounce 1.4s infinite ease-in-out both; }
+  .qa-loading .dot:nth-child(1) { animation-delay: 0s; }
+  .qa-loading .dot:nth-child(2) { animation-delay: 0.2s; }
+  .qa-loading .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Download overlay */
+  .dl-overlay {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.45);
+    justify-content: center;
+    align-items: center;
+  }
+  .dl-overlay.show { display: flex; }
+  .dl-overlay-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 28px 24px 20px;
+    width: 88%;
+    max-width: 400px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    text-align: center;
+  }
+  .dl-overlay-card .dl-overlay-icon { font-size: 40px; margin-bottom: 12px; }
+  .dl-overlay-card .dl-overlay-title { font-size: 17px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+  .dl-overlay-card .dl-overlay-msg { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px; }
+  .dl-overlay-card .dl-overlay-btn {
+    display: inline-block;
+    padding: 10px 36px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .dl-overlay-card .dl-overlay-btn:active { background: var(--primary-light); }
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .suggestion-chip {
+    background: #f0f4ff;
+    color: var(--primary-light);
+    padding: 8px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .suggestion-chip:active { background: var(--primary-light); color: #fff; }
+  .suggestion-chip-2 {
+    background: #f0f4ff;
+    color: var(--primary-light);
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .suggestion-chip-2:active { background: var(--primary-light); color: #fff; }
+
+  /* Download Cards */
+  .dl-card {
+    display: flex;
+    align-items: center;
+    padding: 16px 18px;
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .dl-icon {
+    width: 44px; height: 44px;
+    background: #f0f4ff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 14px;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .dl-info { flex:1; }
+  .dl-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .dl-desc { font-size: 12px; color: var(--text-secondary); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    color: #999;
+    font-size: 12px;
+  }
+
+  /* Search Highlight */
+  mark { background: #fff3b0; padding: 1px 3px; border-radius: 2px; }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--primary);
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+
+  /* Sub-section title */
+  .sub-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 20px 0 10px;
+    padding-left: 12px;
+    border-left: 3px solid var(--primary-light);
+  }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 12px 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 600px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: #f8f9fb;
+    font-weight: 600;
+    color: var(--primary);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Version tag */
+  .version-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+  .ver-current { background: #e8f5ff; color: var(--primary-light); }
+  .ver-historic { background: #f0f0f0; color: #999; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="bank-name">广东华兴银行</div>
+  <h1>银企直联接入指引</h1>
+  <div class="subtitle">企业前置程序 · 安装指引 · 常见问题</div>
+  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260615-1243</div>
+</div>
+
+<!-- Navigation - using anchor links for maximum reliability -->
+<div class="nav" id="nav">
+  <a class="nav-item" href="#sec-home" id="nav-home">快速开始</a>
+  <a class="nav-item" href="#sec-install" id="nav-install">部署安装</a>
+  <a class="nav-item" href="#sec-api" id="nav-api">接口文档</a>
+  <a class="nav-item" href="#sec-connect" id="nav-connect">接入指引</a>
+  <a class="nav-item" href="#sec-download" id="nav-download">下载专区</a>
+  <a class="nav-item" href="#sec-faq" id="nav-faq">常见问题</a>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+
+  <!-- ==================== 快速开始 ==================== -->
+  <section class="section default" id="sec-home">
+
+    <div class="card">
+      <h2 style="font-size:18px;margin-bottom:12px;">使用指南</h2>
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;">
+        本指引为银企直联系统的客户自助服务平台。您可以：
+      </p>
+      <ul style="padding-left:20px;font-size:14px;color:var(--text-secondary);">
+        <li><strong>部署安装</strong> — 按步骤完成JDK、Tomcat、U盾驱动的安装配置</li>
+        <li><strong>接入指引</strong> — 了解测试环境、正式接入流程</li>
+        <li><strong>常见问题</strong> — 自助排查安装部署中的典型故障</li>
+        <li><strong>下载专区</strong> — 获取SDK、接口文档等资源</li>
+      </ul>
+    </div>
+
+    <!-- AI 智能问答 -->
+    <div class="card" style="background:linear-gradient(135deg,#f8faff,#f0f4ff);border:1px solid #d0d8f0;">
+      <h2 style="font-size:18px;margin-bottom:4px;">AI 智能问答</h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">基于 DeepSeek 大模型 + 银企直联知识库，输入问题即可获得专业解答</p>
+      <div class="qa-search-box" style="margin-bottom:12px;">
+        <input type="text" id="qaInput" placeholder="请输入您遇到的问题，例如：Tomcat启动报错怎么办？">
+        <button id="qaSearchBtn">🔍</button>
+      </div>
+      <div class="qa-result" id="qaResult">
+        <div class="result-title" id="qaTitle"></div>
+        <div class="result-content" id="qaContent"></div>
+        <div class="result-source" id="qaSource"></div>
+      </div>
+      <div class="qa-loading" id="qaLoading">
+        AI 正在思考<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+      </div>
+      <div class="suggestions">
+        <span class="suggestion-chip" data-question="JDK安装后java -version不生效怎么办">JDK环境变量配置</span>
+        <span class="suggestion-chip" data-question="Tomcat启动后打不开页面是什么原因">Tomcat无法访问</span>
+        <span class="suggestion-chip" data-question="报文格式怎么组，需要哪些字段">报文格式说明</span>
+        <span class="suggestion-chip" data-question="怎么查询账户列表和余额">查询账户余额</span>
+        <span class="suggestion-chip" data-question="发送报文时签名一直失败">签名验证失败</span>
+        <span class="suggestion-chip" data-question="单笔转账接口怎么调用">单笔转账调用</span>
+        <span class="suggestion-chip" data-question="怎么从测试环境切换到生产环境">切换生产环境</span>
+        <span class="suggestion-chip" data-question="如何获取电子回单PDF">电子回单下载</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:18px;margin-bottom:12px;">快速开始</h2>
+      <div style="display:grid;gap:12px;">
+        <div class="step" style="border-left-color:var(--success);">
+          <div class="step-title"><span class="step-num">1</span> 检查环境要求</div>
+          <p>Windows 7及以上版本（32位操作系统），确保服务器可访问外网或测试网段。</p>
+        </div>
+        <div class="step" style="border-left-color:var(--accent);">
+          <div class="step-title"><span class="step-num">2</span> 安装基础环境</div>
+          <p>安装 JDK 1.8 + Tomcat 8.5 + U盾驱动程序 + 数字证书。</p>
+        </div>
+        <div class="step" style="border-left-color:var(--primary-light);">
+          <div class="step-title"><span class="step-num">3</span> 切换生产模式</div>
+          <p>修改 setting 目录下的配置文件，将 ENV=test 切换为 ENV=prd。</p>
+        </div>
+        <div class="step" style="border-left-color:var(--success);">
+          <div class="step-title"><span class="step-num">4</span> 验证连通性</div>
+          <p>通过 telnet 和本地 URL 测试联通，发送查询报文验证U盾签名。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:18px;margin-bottom:10px;">联系方式</h2>
+      <p style="font-size:14px;color:var(--text-secondary);">
+        接入协调人：群内咨询李鹏、麦裕华<br>
+        通过企业微信/微信群沟通，提供测试环境参数、测试UK等。<br>
+        测试完成确认无误后，由对接群通知切换生产环境。
+      </p>
+      <p style="font-size:13px;color:var(--accent);margin-top:12px;padding:10px 14px;background:#fdf8ec;border-radius:8px;border-left:3px solid var(--accent);">
+        💡 如遇回复不及时，建议先使用"快速开始"或"常见问题"页面的<strong>智能问答</strong>功能自助查询，大部分常见问题都能快速得到解答。
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 部署安装 ==================== -->
+  <section class="section" id="sec-install">
+    <h2>前置机部署手册</h2>
+    <p class="section-desc">当前版本 v1.7（2024-04-28）</p>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="font-size:16px;margin-bottom:12px;color:var(--primary);">设备要求</h3>
+      <p style="font-size:14px;color:var(--text-secondary);">
+        Windows 7及以上版本，32位操作系统。
+      </p>
+    </div>
+
+    <!-- Step 1: JDK -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">1</span> 安装 JDK</div>
+      <p>如已安装 JDK 1.8 版本可跳过此步。</p>
+      <p>运行前置安装包中的 <strong>jdk-8u31-windows-x64.exe</strong>，安装路径选择默认路径，一路点击下一步直至完成。</p>
+      <p>安装成功后，打开 cmd 验证 JDK 版本：</p>
+      <div class="code-block">java -version</div>
+      <div class="note">
+        <strong>配置 JDK 环境变量（默认路径）：</strong><br>
+        JAVA_HOME = C:\Program Files\Java\jdk1.8.0_31<br>
+        CLASS_PATH = .;%JAVA_HOME%\lib;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar
+      </div>
+      <div class="warn">
+        <strong>注意：</strong>需将 jni 控件签名文件 <strong>MdsmJni.dll</strong> 放入路径<br>
+        C:\Program Files\Java\jdk1.8.0_31\jre\bin\ 下。如已安装其他版本 JDK，放到对应 .\jre\bin 目录下。控件有32位和64位版本，JDK需对应，与操作系统无关。
+      </div>
+    </div>
+
+    <!-- Step 2: Tomcat -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">2</span> 安装 Tomcat</div>
+      <p>如已安装 Tomcat 可跳过此步。</p>
+      <p>解压安装包中的 apache-tomcat-8.5.100 到 <strong>D:\GHBANKENTFIN</strong> 目录（只用 apache-tomcat-8.5.100 文件夹）。</p>
+      <p>双击运行 <strong>ssmd</strong> 安装程序（签名程序），安装时默认下一步即可。</p>
+      <div class="note">
+        <strong>系统架构判断：</strong><br>
+        查看"系统信息" → 系统类型，显示"x86"则系统为32位（386）；显示"x64"则系统为64位（amd64）。
+      </div>
+      <p>启动 Tomcat（双击）：</p>
+      <div class="code-block">D:\GHBANKENTFIN\apache-tomcat-8.5.100\bin\startup.bat</div>
+      <p>启动成功后出现命令行窗口，<strong>不要关闭该窗口</strong>。检查是否部署了应用 <strong>ghbankgayway4ent.war</strong>。</p>
+    </div>
+
+    <!-- Step 3: U盾驱动 -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">3</span> 安装U盾驱动</div>
+      <div class="note" style="margin-bottom:8px;">💡 <strong>测试环境无需U盾</strong>，本步骤仅适用于生产环境。测试阶段可直接跳过步骤3、4、7，进入步骤5配置环境。</div>
+      <p>（生产环境）运行安装包中的 <strong>UKey管理工具20210112.exe</strong>，完成UKey管理工具安装。</p>
+      <p>插入U盾后，验证证书是否在系统中：</p>
+      <div class="code-block">开始 → 运行 → certmgr.msc → 查看「GDHXBANK\证书」目录下是否有证书</div>
+    </div>
+
+    <!-- Step 4: U盾密码 -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">4</span> 修改U盾密码</div>
+      <div class="note" style="margin-bottom:8px;">💡 <strong>测试环境无需U盾</strong>，本步骤仅适用于生产环境。</div>
+      <p>（生产环境）首次使用应自定义修改U盾密码（初始密码：<strong>123456</strong>），如未修改，推荐通过"UKey管理工具"修改。</p>
+      <div class="warn">提示需要插入U盾，请确认后修改。</div>
+    </div>
+
+    <!-- Step 5: 切换环境 -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">5</span> 切换环境模式</div>
+      <p>找到配置文件目录：</p>
+      <div class="code-block">D:\GHBANKENTFIN\apache-tomcat-8.5.100\webapps\ghbankgayway4ent\WEB-INF\classes\config\setting\</div>
+      <p><strong>文件1：gayway.properties</strong></p>
+      <div class="code-block">将 ENV=test 修改为 ENV=prd 即可切换为生产环境</div>
+      <p><strong>文件2：gayway.prd.properties</strong></p>
+      <div class="code-block">将 custNo=5600057376 修改为 custNo=【客户实际客户号】</div>
+    </div>
+
+    <!-- Step 6: 连通验证 -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">6</span> 验证连通性</div>
+      <p><strong>测试环境：</strong></p>
+      <div class="code-block">telnet 183.63.138.12 8803
+telnet 183.63.138.117 8803</div>
+      <p>使用浏览器访问以下URL，返回登录提示即表示畅通：</p>
+      <div class="code-block">http://localhost:8080/ghbankgayway4ent/rest/gayway</div>
+      <p><strong>生产环境：</strong></p>
+      <div class="code-block">telnet open.ghbank.com.cn 443</div>
+      <p>同样访问：</p>
+      <div class="code-block">http://localhost:8080/ghbankgayway4ent/rest/gayway</div>
+    </div>
+
+    <!-- Step 7: U盾签名 -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">7</span> 前置机U盾证书验证</div>
+      <div class="note" style="margin-bottom:8px;">💡 <strong>测试环境无需U盾</strong>，测试阶段使用 SKEY 模式（certType=SKEY），不会弹出U盾密码输入框，可直接发送报文测试。本步骤仅适用于生产环境。</div>
+      <p>（生产环境）首次发送报文时，需在部署前置机的服务器上输入U盾密码。推荐首次发送<strong>查询报文</strong>进行测试，如账户余额查询（接口编号：ZTSA63Q01）。</p>
+      <div class="warn">
+        在服务器上输入U盾密码后，系统会缓存密码，后续不再弹窗要求输入。如更换U盾需重新输入密码。
+      </div>
+    </div>
+
+    <!-- Step 8: 启停 -->
+    <div class="step">
+      <div class="step-title"><span class="step-num">8</span> 前置应用启停</div>
+      <p><strong>启动：</strong>双击运行</p>
+      <div class="code-block">D:\GHBANKENTFIN\apache-tomcat-8.5.100\bin\startup.bat</div>
+      <p><strong>停止：</strong>直接关闭命令行窗口即可。</p>
+      <p>如需设置<strong>定时自动重启</strong>（推荐每晚重启保证运行稳定），可参考以下设置：</p>
+      <div class="note">
+        <strong>定时任务设置方法：</strong><br>
+        1. WIN+R → taskschd.msc 打开任务计划程序<br>
+        2. 创建定时关闭任务：每日执行 D:\GHBANKENTFIN\apache-tomcat-8.5.100\bin\timeshutdown.bat<br>
+        3. 创建定时启动任务：在关闭任务5-10分钟后，执行 D:\GHBANKENTFIN\apache-tomcat-8.5.100\bin\timestart.bat<br>
+        4. 选"一次性任务"，点击运行验证
+      </div>
+    </div>
+
+    <!-- 版本记录 -->
+    <div class="card" style="margin-top:20px;">
+      <h3 style="font-size:16px;margin-bottom:14px;color:var(--primary);">版本记录</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>版本号</th><th>修改日期</th><th>修改说明</th><th>状态</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="version-tag ver-current">V1.7</span></td>
+              <td>2024-04-28</td>
+              <td>增加加密工具的操作说明</td>
+              <td>正式版</td>
+            </tr>
+            <tr>
+              <td>V1.6</td>
+              <td>2023-12-01</td>
+              <td>优化排查说明</td>
+              <td>正式版</td>
+            </tr>
+            <tr>
+              <td>V1.5</td>
+              <td>2021-01-18</td>
+              <td>修改为U盾版本操作方式</td>
+              <td>正式版</td>
+            </tr>
+            <tr>
+              <td>V1.4</td>
+              <td>2019-10-21</td>
+              <td>前置机应用修改为加密访问方式</td>
+              <td>正式版</td>
+            </tr>
+            <tr>
+              <td>V1.3</td>
+              <td>2018-09-04</td>
+              <td>修改切换环境模式; 应用v2.0.0支持免U盾测试</td>
+              <td>正式版</td>
+            </tr>
+            <tr>
+              <td>V1.2</td>
+              <td>2018-08-09</td>
+              <td>修改JDK安装说明、连通验证、应用启停</td>
+              <td>正式版</td>
+            </tr>
+            <tr>
+              <td>V1.1</td>
+              <td>2017-09-05</td>
+              <td>增加证书安装; war包配置修改</td>
+              <td>正式版</td>
+            </tr>
+            <tr>
+              <td>V1.0</td>
+              <td>2016-10-20</td>
+              <td>新建文档</td>
+              <td>正式版</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 接口文档 ==================== -->
+  <section class="section" id="sec-api">
+    <h2>接口文档</h2>
+    <p class="section-desc">接入标准 v6.0 | 通讯协议 XML/HTTPS | 接口编号规则：ZTSA63 + 类型(Q查询/F动账/M复合)</p>
+
+    <!-- 通讯方式 -->
+    <div class="card">
+      <div class="sub-title">通讯架构</div>
+      <div style="font-size:14px;color:var(--text-secondary);line-height:2;">
+        <p><strong>银行服务器：</strong></p>
+        <div class="code-block" style="margin:6px 0 10px;">测试：POST http://183.63.138.12:8803/api/custodian/bankEnterpriseDirectInterface/baseInterface/V1
+生产：POST https://open.ghbank.com.cn/api/custodian/bankEnterpriseDirectInterface/baseInterface/V1</div>
+        <p><strong>前置机（企业本地）：</strong></p>
+        <div class="code-block" style="margin:6px 0 10px;">POST http://[前置机IP]:8080/ghbankgayway4ent/rest/gayway</div>
+        <p><strong>HTTP头要求：</strong>Content-Length、Content-Type: application/xml; charset=UTF-8</p>
+        <p><strong>通讯方式：</strong>企业ERP与前置机间用HTTP；前置机与银行间用HTTPS双向认证</p>
+        <p><strong>报文格式：</strong>XML标准报文，UTF-8编码，ROOT为根元素</p>
+      </div>
+    </div>
+
+    <!-- 安全规范 -->
+    <div class="card">
+      <div class="sub-title">安全规范要点</div>
+      <div style="font-size:14px;color:var(--text-secondary);line-height:2;">
+        <ul style="padding-left:20px;">
+          <li><strong>传输加密：</strong>前置机与银行间使用HTTPS协议，保证通道加密</li>
+          <li><strong>数字签名：</strong>使用U盾内企业数字证书进行签名，确保报文的完整性和不可否认性</li>
+          <li><strong>报文防篡改：</strong>签名为ROOT元素的BASE64编码后进行算法签名，结果放入SIGNATURE标签</li>
+          <li><strong>防重放：</strong>涉及资金变动的交易报文，流水号必须保证唯一性，同一流水号只允许执行一次</li>
+          <li><strong>验签：</strong>返回报文去SIGNATURE元素后，用SHA1算法取ROOT摘要，再用SHA1RSA验签</li>
+          <li><strong>测试环境：</strong>支持SKEY免U盾模式（仅在测试阶段），配置certType=SKEY</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 公共字段 -->
+    <div class="card">
+      <div class="sub-title">请求公共字段</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>字段名</th><th>英文名</th><th>类型</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>交易代码</td><td>TRNCD</td><td>Char(10)</td><td>详见接口编号</td></tr>
+            <tr><td>企业号</td><td>CUSTNO</td><td>Char(20)</td><td>我行分配的企业标识</td></tr>
+            <tr><td>企业发起日期</td><td>ENTWORKDT</td><td>Char(8)</td><td>yyyymmdd</td></tr>
+            <tr><td>企业流水号</td><td>ENTSEQNO</td><td>Char(30)</td><td>企业唯一流水</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">响应公共字段</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>字段名</th><th>英文名</th><th>类型</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>企业发起日期</td><td>ENTWORKDT</td><td>Char(8)</td><td>原样返回</td></tr>
+            <tr><td>企业流水号</td><td>ENTSEQNO</td><td>Char(30)</td><td>原样返回</td></tr>
+            <tr><td>响应码</td><td>RSPCD</td><td>Char(6)</td><td>000000=成功; 010001=报文格式异常; 010003=签名验证失败</td></tr>
+            <tr><td>响应信息</td><td>RSPMSG</td><td>Char(200)</td><td>交易成功/失败描述</td></tr>
+            <tr><td>签名</td><td>SIGNATURE</td><td>String</td><td>银行私钥签名值</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 接口清单 -->
+    <div class="card">
+      <div class="sub-title">接口完整清单（共80+个）</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+        接口编号规则：ZTSA63[类型][序号] — Q=查询类、F=动账类、M=复合类
+      </p>
+    </div>
+
+    <!-- 一、账户信息查询 -->
+    <div class="card" style="border-left: 4px solid var(--primary-light);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:10px;">一、账户信息查询</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63Q01</td><td>账户列表查询</td><td>查询企业银企直联签约账户及余额</td></tr>
+            <tr><td>ZTSA63Q02</td><td>子账户列表查询</td><td>查询子账户列表</td></tr>
+            <tr><td>ZTSA63Q03</td><td>账户交易明细查询</td><td>按账号查询交易明细（唯一定位：ACCTNO+TRNDT+HOSTSEQNO+DRCRFLAG）</td></tr>
+            <tr><td>ZTSA63Q09</td><td>账户历史余额查询</td><td>查询指定日期的历史余额</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 二、企业财务室（智慧路由+转账+电子回单） -->
+    <div class="card" style="border-left: 4px solid var(--accent);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:6px;">二、企业财务室 — 智慧路由</h3>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">智慧路由系列支持对公转私等场景，通过路由查询获取可用通道</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63Q25</td><td>智慧路由卡号查询清算行</td><td>通过客户编号查询联行信息</td></tr>
+            <tr><td>ZTSA63Q26</td><td>智慧路由试算</td><td>根据客户编号和路由信息获取可用通道列表</td></tr>
+            <tr><td>ZTSA63F10</td><td>智慧路由单笔转账</td><td>智慧路由单笔转账</td></tr>
+            <tr><td>ZTSA63Q27</td><td>智慧路由单笔转账结果查询</td><td>查询单笔转账结果</td></tr>
+            <tr><td>ZTSA63F11</td><td>智慧路由批量转账</td><td>智慧路由批量转账</td></tr>
+            <tr><td>ZTSA63Q28</td><td>智慧路由批量转账明细查询</td><td>查询批量转账明细</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 电子回单 -->
+    <div class="card" style="border-left: 4px solid var(--warning);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:6px;">企业财务室 — 电子回单</h3>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">v6.0新增PDF下载类接口（ZTSA63Q21~Q24），支持批量生成和下载回单PDF</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63Q20</td><td>电子回单列表查询（新）</td><td>按账号+日期查询回单列表</td></tr>
+            <tr><td>ZTSA63Q21</td><td>电子回单PDF请求下载（批量）</td><td>按回单号批量发起PDF生成请求</td></tr>
+            <tr><td>ZTSA63Q22</td><td>电子回单PDF下载查询（批量）</td><td>按回单号查询PDF生成状态</td></tr>
+            <tr><td>ZTSA63Q23</td><td>电子回单PDF下载（批量）</td><td>批量下载已生成的PDF回单</td></tr>
+            <tr><td>ZTSA63Q24</td><td>电子回单PDF下载（单笔）</td><td>单笔下载PDF回单</td></tr>
+            <tr><td>ZTSA63Q04</td><td>电子回单查询</td><td>提供回单打印格式的交易信息</td></tr>
+            <tr><td>ZTSA63Q08</td><td>电子回单打印</td><td>将回单标记为已打印状态</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 转账 -->
+    <div class="card" style="border-left: 4px solid var(--success);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:6px;">企业财务室 — 转账汇款</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63F01</td><td>单笔转账</td><td>单笔对外转账（需U盾签名）</td></tr>
+            <tr><td>ZTSA63Q05</td><td>单笔转账查询</td><td>按流水查询单笔转账结果</td></tr>
+            <tr><td>ZTSA63F02</td><td>批量转账</td><td>批量对外转账</td></tr>
+            <tr><td>ZTSA63Q06</td><td>批量付款查询</td><td>查询批量转账明细结果</td></tr>
+            <tr><td>ZTSA63Q70</td><td>实时转账银行列表查询</td><td>获取实时转账支持的银行列表</td></tr>
+            <tr><td>ZTSA63Q71</td><td>普通加急转账银行列表增量变化查询</td><td>超10万条，建议定时文件手工更新</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 聚合接口 -->
+    <div class="card" style="border-left: 4px solid var(--danger);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:6px;">企业财务室 — 聚合接口</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63M15</td><td>南海铝业汇总接口</td><td>票交所业务聚合入口</td></tr>
+            <tr><td>ZTSA63M40</td><td>特约企业对接汇总接口</td><td>仅限签约企业使用，内嵌子接口调用</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 三、定活互转 -->
+    <div class="card" style="border-left: 4px solid var(--text-secondary);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:10px;">三、定活互转</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63F04</td><td>活期转定期</td><td>活期转存定期存款</td></tr>
+            <tr><td>ZTSA63F05</td><td>定期转活期</td><td>定期存款提前支取/到期转活期</td></tr>
+            <tr><td>ZTSA63Q31</td><td>普通定期存款利率查询</td><td>查询各期限定期利率</td></tr>
+            <tr><td>ZTSA63Q32</td><td>获取账户利息查询</td><td>查询定期账户利息信息</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 四、电子商业汇票 -->
+    <div class="card" style="border-left: 4px solid var(--primary);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:10px;">四、电子商业汇票（ECDS）— 30个接口</h3>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">v6.0大幅扩展，涵盖出票、承兑、收票、背书、贴现、质押、保证、追索等全流程。新增批量签收、票据影像下载等接口。</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>分类</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63M18</td><td>批量票面信息校验</td><td>校验</td></tr>
+            <tr><td>ZTSA63M19</td><td>批量票据出票登记接收</td><td>出票</td></tr>
+            <tr><td>ZTSA63Q33</td><td>批量出票批次查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63Q34</td><td>批量出票明细查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63Q35</td><td>客户票据行为列表查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63M20</td><td>提示承兑申请</td><td>承兑</td></tr>
+            <tr><td>ZTSA63M21</td><td>提示收票申请</td><td>收票</td></tr>
+            <tr><td>ZTSA63M22</td><td>票据撤销交易申请</td><td>撤销</td></tr>
+            <tr><td>ZTSA63M23</td><td>撤票处理</td><td>退票</td></tr>
+            <tr><td>ZTSA63M24</td><td>背书转让申请</td><td>背书</td></tr>
+            <tr><td>ZTSA63M25</td><td>票据贴现申请</td><td>贴现</td></tr>
+            <tr><td>ZTSA63M26</td><td>贴现凭证查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63M27</td><td>质押申请</td><td>质押</td></tr>
+            <tr><td>ZTSA63M28</td><td>质押解除申请</td><td>质押</td></tr>
+            <tr><td>ZTSA63M29</td><td>提示付款申请</td><td>付款</td></tr>
+            <tr><td>ZTSA63M30</td><td>通用签收</td><td>签收</td></tr>
+            <tr><td>ZTSA63M31</td><td>票据贴现利息计算</td><td>计算</td></tr>
+            <tr><td>ZTSA63M32</td><td>票据保证</td><td>保证</td></tr>
+            <tr><td>ZTSA63M33</td><td>同意清偿通知申请</td><td>清偿</td></tr>
+            <tr><td>ZTSA63M34</td><td>追索通知申请</td><td>追索</td></tr>
+            <tr><td>ZTSA63M35</td><td>不可转让撤销</td><td>撤销</td></tr>
+            <tr><td>ZTSA63M36</td><td>贴现凭证生成通知</td><td>通知</td></tr>
+            <tr><td>ZTSA63M37</td><td>票据影像文件下载</td><td>下载</td></tr>
+            <tr><td>ZTSA63M38</td><td>票据信息下载(票面正反面)</td><td>下载</td></tr>
+            <tr><td>ZTSA63Q36</td><td>票面信息正面信息查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63Q37</td><td>票面信息背面信息查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63Q38</td><td>票据可追索人查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63Q39</td><td>票据历史交易信息查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63Q46</td><td>批量通用签收批次查询</td><td>查询</td></tr>
+            <tr><td>ZTSA63Q47</td><td>批量通用签收批次明细查询</td><td>查询</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 五、银企对账 -->
+    <div class="card" style="border-left: 4px solid var(--warning);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:10px;">五、银企对账 — 10个接口</h3>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">v6.0新增对账结果发送类接口（M12/M13/M14）及对账单打印（M50）</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63Q30</td><td>总账户余额对账情况查询</td><td>查询账户余额对账单</td></tr>
+            <tr><td>ZTSA63Q16</td><td>获取账号类型</td><td>获取账户类型信息</td></tr>
+            <tr><td>ZTSA63Q29</td><td>总账户签约信息查询</td><td>查询签约协议信息</td></tr>
+            <tr><td>ZTSA63Q17</td><td>子账户对账情况查询</td><td>查询未对账的账务明细</td></tr>
+            <tr><td>ZTSA63Q18</td><td>账号交易明细查询(含历史)</td><td>含历史的交易明细对账</td></tr>
+            <tr><td>ZTSA63Q19</td><td>账号未达账结果查询</td><td>查询尚未对账的结果</td></tr>
+            <tr><td>ZTSA63M12</td><td>明细对账结果发送</td><td>发送明细对账结果</td></tr>
+            <tr><td>ZTSA63M13</td><td>银企对账账号未达账发送</td><td>发送未达账项信息</td></tr>
+            <tr><td>ZTSA63M14</td><td>总账户余额对账结果发送</td><td>发送余额对账结果</td></tr>
+            <tr><td>ZTSA63M50</td><td>银企对账单打印</td><td>对账单打印接口</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 六、电子票据（NEW） -->
+    <div class="card" style="border-left: 4px solid var(--danger);">
+      <h3 style="font-size:15px;color:var(--primary);margin-bottom:10px;">六、电子票据（v6.0 新增）</h3>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">全新模块，支持电子发票的开票申请、流水查询和结果查询</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>接口编号</th><th>接口名称</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>ZTSA63Q72</td><td>开票流水查询</td><td>查询开票流水记录</td></tr>
+            <tr><td>ZTSA63M48</td><td>开票申请</td><td>提交开票申请</td></tr>
+            <tr><td>ZTSA63Q73</td><td>开票结果查询</td><td>查询开票申请的处理结果</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 示例报文 -->
+    <div class="card">
+      <div class="sub-title">报文示例（账户列表查询 ZTSA63Q01）</div>
+      <p style="font-size:13px;margin-bottom:8px;color:var(--text-secondary);">请求报文：</p>
+      <div class="code-block">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;ROOT&gt;
+  &lt;TRNCD&gt;ZTSA63Q01&lt;/TRNCD&gt;
+  &lt;CUSTNO&gt;5600057376&lt;/CUSTNO&gt;
+  &lt;ENTWORKDT&gt;20240101&lt;/ENTWORKDT&gt;
+  &lt;ENTSEQNO&gt;0000000123&lt;/ENTSEQNO&gt;
+&lt;/ROOT&gt;</div>
+      <p style="font-size:13px;margin:12px 0 8px;color:var(--text-secondary);">响应报文：</p>
+      <div class="code-block">&lt;ROOT&gt;
+  &lt;ENTWORKDT&gt;20240101&lt;/ENTWORKDT&gt;
+  &lt;ENTSEQNO&gt;0000000123&lt;/ENTSEQNO&gt;
+  &lt;RSPCD&gt;000000&lt;/RSPCD&gt;
+  &lt;RSPMSG&gt;交易成功&lt;/RSPMSG&gt;
+  &lt;TOTALROWNUM&gt;2&lt;/TOTALROWNUM&gt;
+  &lt;ROW&gt;
+    &lt;ACCTNO&gt;800100120123456&lt;/ACCTNO&gt;
+    &lt;ACCTNAME&gt;XX有限公司&lt;/ACCTNAME&gt;
+    &lt;CCY&gt;01&lt;/CCY&gt;
+    &lt;BALANCE&gt;1000000.00&lt;/BALANCE&gt;
+  &lt;/ROW&gt;
+  &lt;ROW&gt;
+    &lt;ACCTNO&gt;800100120123457&lt;/ACCTNO&gt;
+    &lt;ACCTNAME&gt;XX有限公司(定期)&lt;/ACCTNAME&gt;
+    &lt;CCY&gt;01&lt;/CCY&gt;
+    &lt;BALANCE&gt;500000.00&lt;/BALANCE&gt;
+  &lt;/ROW&gt;
+  &lt;SIGNATURE&gt;...&lt;/SIGNATURE&gt;
+&lt;/ROOT&gt;</div>
+    </div>
+
+    <!-- API 开发示例 -->
+    <div class="card">
+      <div class="sub-title">Java调用示例（含签名）</div>
+      <div class="code-block">// 步骤1：初始化 HTTPS 发送器
+HTTPSSender sender = new HTTPSSender("conf/gayway.test.properties");
+
+// 步骤2：读取报文文件并发送
+String requestXml = readFile("case/A63/查询/账户列表查询.xml");
+String responseXml = sender.send(requestXml);
+
+// 步骤3：关闭连接
+sender.close();</div>
+      <div class="note" style="margin-top:10px;">
+        <strong>配置文件说明：</strong><br>
+        gayway.properties — 环境切换（test/prd）<br>
+        gayway.test.properties — 测试环境参数（certType=SKEY / UKEY，serverURL）<br>
+        gayway.prd.properties — 生产环境参数（certType=UKEY，custNo=实际客户号）
+      </div>
+    </div>
+
+    <!-- 响应码 -->
+    <div class="card">
+      <div class="sub-title">常见响应码</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>响应码</th><th>含义</th></tr></thead>
+          <tbody>
+            <tr><td>000000</td><td>交易成功</td></tr>
+            <tr><td>010001</td><td>报文格式异常</td></tr>
+            <tr><td>010002</td><td>报文内容格式异常</td></tr>
+            <tr><td>010003</td><td>报文签名验证失败</td></tr>
+            <tr><td>020001</td><td>客户号不存在/未签约</td></tr>
+            <tr><td>020002</td><td>账号不存在/未签约银企直联</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 版本 -->
+    <div class="card" style="margin-top:16px; opacity:0.85;">
+      <p style="font-size:13px;color:var(--text-secondary);">
+        当前文档版本：<strong>v6.0</strong> | 适用范围：合作公司<br>
+        文档不定期更新，请关注对接群通知获取最新版本。
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 接入指引 ==================== -->
+  <section class="section" id="sec-connect">
+    <h2>接入指引</h2>
+    <p class="section-desc">企业客户接入银企直联系统的完整流程</p>
+
+    <div class="notice-banner">
+      <strong>接入协调人</strong>
+      <p style="margin-top:8px;font-size:14px;">
+        由我行科技部技术同事协调企业搭建系统的程序员。通过企业微信/微信对接群沟通，群内答疑。测试完成后确认无误，通过对接群通知切换到生产环境。
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">一、接入前须知</div>
+      <ul style="padding-left:20px;font-size:14px;color:var(--text-secondary);">
+        <li>先在<strong>测试环境</strong>进行连通性测试</li>
+        <li>测试环境会提供必要的测试账号以及测试网段（如银行内部网络）</li>
+        <li>测试数据无固定格式（转账信息、存款信息等），在微信群内发送即可</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">二、测试环境</div>
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:8px;">
+        🟢 <strong>测试环境无需U盾</strong>，使用 SKEY 免U盾模式进行测试，部署手册中的步骤3（安装U盾驱动）、步骤4（修改U盾密码）、步骤7（U盾证书验证）可直接跳过。
+      </p>
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:8px;">
+        测试环境参数：参见《部署手册》中 <strong>1.7节 切换环境模式</strong> 下的测试环境配置（ENV=test，certType=SKEY）。
+      </p>
+      <p style="font-size:14px;color:var(--text-secondary);">
+        ⚠️ 测试环境IP地址可能不是最新的，如无法连接请咨询对接群。可以先发一笔转账，从返回报文获取测试环境实际地址，或参考 <strong>1.9节 常见问题排查</strong>。
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">三、正式接入</div>
+      <ul style="padding-left:20px;font-size:14px;color:var(--text-secondary);">
+        <li>签署协议：需签署《银企直联协议》《服务申请表》《企业证书授权书》等文件</li>
+        <li>客户号：即"企业号"，指与我行签约的企业客户号，联系您的客户经理获取</li>
+        <li>正式UK：完成签约后发放正式环境的UKEY</li>
+        <li>切换配置：将 ENV=test 改为 ENV=prd，客户号改为实际客户号</li>
+        <li>验证：通过查询报文（ZTSA63Q01）验证正式环境连通</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================== 常见问题 ==================== -->
+  <section class="section" id="sec-faq">
+    <h2>常见问题排查</h2>
+    <p class="section-desc">以下是安装部署过程中最常遇到的问题及解决方法</p>
+
+    <!-- AI 智能问答（常见问题页入口） -->
+    <div class="card" style="background:linear-gradient(135deg,#f8faff,#f0f4ff);border:1px solid #d0d8f0;margin-bottom:20px;">
+      <h3 style="font-size:16px;margin-bottom:4px;">AI 智能问答</h3>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">输入问题，AI 基于知识库秒答</p>
+      <div class="qa-search-box" style="margin-bottom:10px;">
+        <input type="text" id="qaInput2" placeholder="输入问题，例如：Tomcat启动报错？">
+        <button id="qaSearchBtn2">🔍</button>
+      </div>
+      <div class="qa-result" id="qaResult2">
+        <div class="result-title" id="qaTitle2"></div>
+        <div class="result-content" id="qaContent2"></div>
+        <div class="result-source" id="qaSource2"></div>
+      </div>
+      <div class="qa-loading" id="qaLoading2">
+        AI 正在思考<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+      </div>
+      <div class="suggestions">
+        <span class="suggestion-chip-2" data-question="JDK安装后java -version不生效怎么办">JDK环境变量</span>
+        <span class="suggestion-chip-2" data-question="Tomcat启动后打不开页面是什么原因">Tomcat无法访问</span>
+        <span class="suggestion-chip-2" data-question="报文格式怎么组，需要哪些字段">报文格式说明</span>
+        <span class="suggestion-chip-2" data-question="发送报文时签名一直失败">签名验证失败</span>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        启动Tomcat报错：Can't load IA 32-bit .dll on AMD 64-bit platform
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p>原因：JDK版本不匹配或环境变量配置错误。</p>
+        <p><strong>排查步骤：</strong></p>
+        <ol style="padding-left:20px;margin-top:8px;">
+          <li>检查 JAVA_HOME 环境变量是否正确</li>
+          <li>在 cmd 中执行 <code>java -version</code> 确认版本</li>
+          <li>找到并确认对应的JDK安装目录（例如 jdk1.8.0_111）</li>
+          <li>另一种可能是绿色版JDK，需修改加载的库文件</li>
+        </ol>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Tomcat启动后浏览器访问404/无法访问
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p><strong>排查步骤：</strong></p>
+        <ol style="padding-left:20px;margin-top:8px;">
+          <li>防火墙未开放端口</li>
+          <li>环境变量配置有多个JRE冲突</li>
+          <li>jni控件文件（MdsmJni.dll）未放置到正确位置</li>
+          <li>端口被占用：<code>netstat -ano | findstr 8080</code></li>
+          <li>如需修改端口：编辑 <code>apache-tomcat-8.5.100\conf\server.xml</code></li>
+          <li>注意：修改端口后如更换服务器，需同时修改防火墙</li>
+        </ol>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        签名一直失败 / 验签不通过
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p>常见原因：</p>
+        <ol style="padding-left:20px;margin-top:8px;">
+          <li>首次发送报文时Tomcat会弹U盾密码输入框——如果弹窗出现时没有输入密码就关闭了，会导致持续签名失败</li>
+          <li>U盾未正确插入或驱动未安装</li>
+          <li>证书未导入（用 certmgr.msc 检查是否有 GDHXBANK 目录的证书）</li>
+          <li>key库配置问题</li>
+        </ol>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        证书检查：找不到GDHXBANK证书
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p>在 cmd 中运行 <code>certmgr.msc</code>，搜索 "ghbank"，确认是否有证书。</p>
+        <p>如果没有证书：</p>
+        <ul style="padding-left:20px;margin-top:8px;">
+          <li>重新导入证书（需插入U盾）</li>
+          <li>检查U盾驱动程序是否安装成功</li>
+        </ul>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        使用财务软件或司库系统对接，银行侧有区别吗
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p>没有区别。企业无论使用财务软件还是司库系统对接银行的银企直联系统，对银行来说都是一样的，处理方式完全相同。</p>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        U盾证书有效期快到了 / 刚开通就提示有效期不足
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p>U盾证书有效期是5年，但可能存在预制备的证书，导致企业开通银企直联后没多久就提示有效期快到了。</p>
+        <p><strong>解决方法：</strong>请联系对应的客户经理，带齐资料以及U盾到我行网点更新证书。</p>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ssmd安装程序弹窗后立即自动关闭
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p>原因：电脑上安装了抓包工具（如Fiddler、Wireshark等），ssmd检测到后自动关闭。</p>
+        <p><strong>解决方法：</strong>先关闭所有抓包工具，再重新运行ssmd安装程序。</p>
+      </div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        如何查看前置机运行日志？
+        <span class="arrow">▼</span>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">
+        <p>日志文件位置：</p>
+        <div class="code-block" style="margin:10px 0;">D:\GHBANKENTFIN\apache-tomcat-8.5.100\ghbankgayway4ent.log</div>
+        <p>通过日志可查看详细请求和错误信息，快速定位问题。</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ==================== 下载专区 ==================== -->
+  <section class="section" id="sec-download">
+    <h2>下载专区</h2>
+    <p class="section-desc">以下资源供客户接入使用，请使用提供的链接和提取码下载</p>
+
+    <div class="card">
+      <h3 style="font-size:16px;margin-bottom:14px;color:var(--primary);">SDK 与接口文档</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
+        接口文档和SDK可通过以下网盘链接获取：
+      </p>
+      <a class="dl-card" href="https://web.ugreen.cloud/web/#/share/4bfd0a4053d546fca9a1b3c7df4ec158" target="_blank" rel="noopener">
+        <div class="dl-icon">📦</div>
+        <div class="dl-info">
+          <div class="dl-name">私有NAS下载（主地址）</div>
+          <div class="dl-desc">提取码：SCF4</div>
+        </div>
+      </a>
+      <a class="dl-card" href="https://pan.baidu.com/s/13VQmGJJE7jMMWRu_R3dyoA?pwd=HXYH" target="_blank" rel="noopener">
+        <div class="dl-icon">☁️</div>
+        <div class="dl-info">
+          <div class="dl-name">百度网盘下载（备用地址1）</div>
+          <div class="dl-desc">提取码：HXYH</div>
+        </div>
+      </a>
+      <a class="dl-card" href="https://pan.quark.cn/s/7cd2054007f8" target="_blank" rel="noopener">
+        <div class="dl-icon">💾</div>
+        <div class="dl-info">
+          <div class="dl-name">夸克网盘下载（备用地址2）</div>
+          <div class="dl-desc">无需提取码，直接访问</div>
+        </div>
+      </a>
+    </div>
+
+  </section>
+
+</div>
+
+<!-- Download Modal Overlay -->
+<div class="dl-overlay" id="dlOverlay">
+  <div class="dl-overlay-card">
+    <div class="dl-overlay-icon">📦</div>
+    <div class="dl-overlay-title" id="dlOverlayTitle"></div>
+    <div class="dl-overlay-msg" id="dlOverlayMsg"></div>
+    <button class="dl-overlay-btn" id="dlOverlayClose">知道了</button>
+  </div>
+</div>
+
+<div class="footer">
+  <p>银企直联接入指引 | 如有疑问请联系对接群</p>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // --- FAQ toggle ---
+  window.toggleFaq = function(el) {
+    el.parentElement.classList.toggle('open');
+  };
+
+  // --- Download tip (standalone overlay, works from any section) ---
+  window.showDownloadTip = function(title, msg) {
+    var overlay = document.getElementById('dlOverlay');
+    var titleEl = document.getElementById('dlOverlayTitle');
+    var msgEl = document.getElementById('dlOverlayMsg');
+    if (!overlay || !titleEl || !msgEl) return;
+    titleEl.textContent = title;
+    msgEl.innerHTML = msg.replace(/\n/g, '<br>');
+    overlay.classList.add('show');
+  };
+
+  // --- Highlight active nav ---
+  function highlightNav() {
+    var hash = window.location.hash;
+    var items = document.querySelectorAll('.nav-item');
+    for (var i = 0; i < items.length; i++) {
+      items[i].classList.remove('active');
+    }
+    if (hash) {
+      var active = document.querySelector('.nav-item[href="' + hash + '"]');
+      if (active) active.classList.add('active');
+    } else {
+      var home = document.getElementById('nav-home');
+      if (home) home.classList.add('active');
+    }
+  }
+  window.addEventListener('hashchange', highlightNav);
+  highlightNav();
+
+  // --- AI Chat: 通过 SCF 云函数代理调用 DeepSeek API（Key 保护在服务端环境变量） ---
+  var SCF_PROXY_URL = 'https://1256784020-e0oiiqytiv.ap-guangzhou.tencentscf.com';
+  var SYSTEM_PROMPT = `你是银企直联系统的智能客服助手，专门为企业客户解答银企直联接入和使用的各类问题。
+
+## 你的原则
+- 基于以下知识库内容回答，知识库没有覆盖的问题可以结合你的常识回答
+- 不要联网搜索，不要编造不存在的接口或功能
+- 回答要专业、准确、简洁
+- 涉及银行内部流程时，可引导客户咨询对接微信群
+- 用中文回答
+
+## 知识库
+
+### 当前接口文档版本：v6.0（2026-05-25）
+以下接口信息基于《银企直连接入标准v6.0》。v6.0新增接口：ZTSA63Q46批量通用签收批次查询、ZTSA63Q47批量通用签收批次明细查询、ZTSA63M50银企对账单打印。v5.9新增接口：ZTSA63Q09账户历史余额查询、电子票据模块(ZTSA63Q72/ZTSA63M48/ZTSA63Q73)。
+
+### JDK安装与环境变量配置
+运行 jdk-8u31-windows-x64.exe，使用默认安装路径。安装后在cmd执行 java -version 确认版本为1.8。设置环境变量：JAVA_HOME=C:\Program Files\Java\jdk1.8.0_31。将 MdsmJni.dll 控件文件放入 C:\Program Files\Java\jdk1.8.0_31\jre\bin\ 目录。
+
+### Tomcat启动及访问异常排查
+1.检查防火墙是否开放8080端口。2.确认环境变量是否配置正确，是否存在多个JRE。3.检查 MdsmJni.dll 是否已放入jre/bin目录。4.检查端口占用：netstat -ano | findstr 8080。5.查看日志：D:\GHBANKENTFIN\apache-tomcat-8.5.100\ghbankgayway4ent.log
+
+### 签名验证失败排查
+1.首次发送报文时Tomcat弹出U盾密码输入框——务必输入密码，不能直接关闭弹窗。2.检查U盾是否正确插入且驱动已安装。3.在cmd运行 certmgr.msc，查看GDHXBANK目录下是否有证书。4.推荐首次使用查询报文ZTSA63Q01测试。
+
+### 证书检查与导入
+cmd运行 certmgr.msc → 搜索"ghbank"，确认GDHXBANK目录下有证书。没有则：确认U盾已插入→重新安装驱动→导入证书。
+
+### 测试环境与生产环境切换
+配置文件：D:\GHBANKENTFIN\apache-tomcat-8.5.100\webapps\ghbankgayway4ent\WEB-INF\classes\config\setting\
+生产环境：gayway.properties → ENV=prd，gayway.prd.properties → custNo=实际客户号
+测试环境：gayway.properties → ENV=test
+
+### ssmd安装程序自动关闭
+原因：电脑上有抓包工具(Fiddler/Wireshark等)，ssmd检测后自动关闭。解决：关闭抓包工具后重新运行。
+
+### 查看前置机运行日志
+日志路径：D:\GHBANKENTFIN\apache-tomcat-8.5.100\ghbankgayway4ent.log
+
+### 连通性测试
+测试环境：telnet 183.63.138.12 8803 或 telnet 183.63.138.117 8803
+浏览器访问：http://localhost:8080/ghbankgayway4ent/rest/gayway
+生产环境：telnet open.ghbank.com.cn 443
+
+### 网络环境说明
+一般情况下使用公网，无需配置企业网络白名单。若企业有安全合规要求，可将以下银行出口IP配置为白名单（方向：银行→企业，即回调/通知场景）：
+
+生产环境接入域名（企业→银行）：https://open.ghbank.com.cn
+
+银行出口IP（银行→企业，如有白名单需求可配置）：
+- 电信 IPv4：125.88.32.130 / 125.88.32.131 / 125.88.32.132
+- 联通 IPv4：218.107.48.196 / 218.107.48.197 / 218.107.48.198
+- 移动 IPv4：120.234.170.130 / 120.234.170.131 / 120.234.170.132
+- 电信 IPv6：240e:6b0:1d0:b::2 / 240e:6b0:1d0:b::3 / 240e:6b0:1d0:b::4
+- 联通 IPv6：2408:8656:658:1063::4 / 2408:8656:658:1063::5 / 2408:8656:658:1063::6
+- 移动 IPv6：2409:8754:610:4817::2 / 2409:8754:610:4817::3 / 2409:8754:610:4817::4
+
+### U盾密码管理
+测试环境无需U盾，测试阶段使用SKEY模式，无需任何U盾操作。正式环境U盾初始密码：123456，首次使用通过"UKey管理工具"修改密码；服务器首次输入后系统缓存密码。
+
+### 前置机环境要求
+Windows 7及以上，32位系统。JDK 1.8、Tomcat 8.5.100、U盾驱动、数字证书。安装目录：D:\GHBANKENTFIN
+
+### 配置定时自动重启
+WIN+R→taskschd.msc。创建关闭任务：每日定时执行timeshutdown.bat。创建启动任务：5-10分钟后执行timestart.bat。建议每晚自动重启。
+
+### 财务软件/司库系统对接说明
+企业使用财务软件或司库系统对接银行的银企直联系统，对银行来说都是一样的，无差别对待。
+
+### U盾证书有效期及更新
+U盾证书有效期是5年，但可能存在预制备的证书，企业开通银企直联后可能没多久就提示有效期快到了。如遇此情况，请联系对应的客户经理，带齐资料以及U盾到我行网点更新证书。
+
+### 正式接入流程
+1.测试环境完成连通验证。2.签署《银企直联协议》《服务申请表》《企业证书授权书》。3.获取企业客户号。4.获取正式环境UKEY。5.切换配置为生产环境(ENV=prd)。6.用查询接口验证正式环境连通。
+
+### 测试环境说明
+测试环境无需U盾，使用SKEY免U盾模式直接进行测试（certType=SKEY）。部署时步骤3（安装U盾驱动）、步骤4（修改U盾密码）、步骤7（U盾证书验证）可跳过。测试环境IP可能变动，如失效请咨询对接群。
+
+### 测试数据（2025-04-07版）
+
+**SIT1 测试环境 — 签约账号**
+客户号（CUSTNO）：5000016877
+- 账户：801880100135725，户名：广西利德日网有机化工厂，子户：00001，类型：单位活期，权限：查询转账
+- 账户：210001075899，户名：青岛孟庙浩泰化学总厂，子户：00001，类型：单位活期，权限：查询转账
+- 账户：801860100016136，户名：广西利德日网有机化工厂，类型：对公人民币定期存款账户，权限：查询转账
+
+**SIT2 测试环境 — 签约账号**
+客户号（CUSTNO）：5600163065
+- 账户：210000975405，户名：四川拉萨配件建筑工程公司，子户：00001，类型：单位活期，权限：查询转账
+- 账户：220004388041，户名：贵州天坛天泰粮油食品有限公司，子户：00001，类型：单位活期，权限：查询转账
+
+**测试收款账号（SIT1/SIT2通用）**
+- 行内-企业：账号 801880100129522，户名：重庆建德志诚公司
+- 行内-个人：账号 6231132203000253712，户名：岑释粱
+- 行外-企业：联行号 313333090004，账号 100011521610010001，户名：王开始集团股份测试
+- 行外-个人：联行号 314305106644，账号 110000002730，户名：品喜喜测试
+
+**测试账号转账限额**
+- 公转私单笔限额：50,000.01元
+- 公转私日累计限额：999,999,999.99元
+- 公转私月累计限额：5,000,000元
+- 非柜面非同名日累计笔数：10,000笔
+- 非柜面非同名日累计限额：999,999,999.99元
+- 非柜面非同名年累计限额：100,000,000元
+- 实时（超级网银）单笔限额：1,000,000元
+- 普通（小额）单笔限额：1,000,000元
+
+### 银企直联接口调用地址
+测试环境：POST http://183.63.138.12:8803/api/custodian/bankEnterpriseDirectInterface/baseInterface/V1
+生产环境：POST https://open.ghbank.com.cn/api/custodian/bankEnterpriseDirectInterface/baseInterface/V1
+前置机本地：POST http://[前置机IP]:8080/ghbankgayway4ent/rest/gayway
+
+### 报文格式
+XML标准格式，UTF-8编码，ROOT为根元素。请求公共字段：TRNCD(交易代码如ZTSA63Q01)、CUSTNO(客户号)、ENTWORKDT(日期)、ENTSEQNO(唯一流水号)。响应含RSPCD(000000=成功)、SIGNATURE(银行签名)。循环列表在ROW元素下。
+
+### 数字签名流程
+签名过程：ROOT元素BASE64编码后用U盾私钥SHA1RSA签名，结果放入SIGNATURE标签。验签过程：去除SIGNATURE后SHA1取摘要，SHA1RSA+银行公钥验证。测试环境支持SKEY免U盾模式(certType=SKEY)。
+
+### 账户余额查询说明
+签约了银企直联的账号都可以查询。通过账户列表查询（ZTSA63Q01）或子账户列表查询（ZTSA63Q02）等接口可获取所有已签约账户信息及余额。未签约银企直联的账号无法查询。当客户询问某接口能否查到所有账户余额时，回答：签约了银企直联的账号都可以查询。
+
+## v6.0 完整接口清单（共72个接口）
+
+接口编号规则：ZTSA63[类型][序号]，Q=查询类、F=动账类、M=复合类。
+
+### 一、账户信息查询（4个）
+ZTSA63Q01 | 账户列表查询 | 查询企业银企直联签约账户及余额，返回ACCTNO/ACCTNAME/CCY/BALANCE/AVLBAL
+ZTSA63Q02 | 子账户列表查询 | 查询子账户列表及余额
+ZTSA63Q03 | 账户交易明细查询 | 按账号查询交易明细，唯一定位：ACCTNO+TRNDT+HOSTSEQNO+DRCRFLAG
+ZTSA63Q09 | 账户历史余额查询 | v5.9新增。查询指定日期(QUERYDT,YYYYMMDD)的历史余额，返回BALANCE/AVLBAL
+
+### 二、企业财务室（21个）
+--- 智慧路由（6个）---
+ZTSA63Q25 | 智慧路由卡号查询清算行 | 通过客户编号查询联行信息
+ZTSA63Q26 | 智慧路由试算 | 根据客户编号和路由信息获取可用通道列表
+ZTSA63F10 | 智慧路由单笔转账 | 智慧路由单笔转账（动账类，需U盾签名）
+ZTSA63Q27 | 智慧路由单笔转账结果查询 | 查询单笔转账结果
+ZTSA63F11 | 智慧路由批量转账 | 智慧路由批量转账（动账类）
+ZTSA63Q28 | 智慧路由批量转账明细查询 | 查询批量转账明细
+--- 电子回单（7个）---
+ZTSA63Q20 | 电子回单列表查询（新） | 按账号+日期查询回单列表
+ZTSA63Q21 | 电子回单PDF请求下载（批量） | 按回单号批量发起PDF生成请求
+ZTSA63Q22 | 电子回单PDF下载查询（批量） | 按回单号查询PDF生成状态（0未生成/1已生成/2生成中）
+ZTSA63Q23 | 电子回单PDF下载（批量） | 批量下载已生成的PDF回单
+ZTSA63Q24 | 电子回单PDF下载（单笔） | 单笔下载PDF回单
+ZTSA63Q04 | 电子回单查询 | 提供回单打印格式的交易信息
+ZTSA63Q08 | 电子回单打印 | 将回单标记为已打印状态
+--- 转账汇款（6个）---
+ZTSA63F01 | 单笔转账 | 单笔对外转账，字段：PAYACCTNO/RCVACCTNO(26位)/RCVACCTNAME/CCY/TRNAMT/CHNL(0普通/1加急/2实时)/REMARK，需U盾签名，ENTSEQNO必须唯一
+ZTSA63Q05 | 单笔转账查询 | 按流水查询单笔转账结果（返回HOSTDT/HOSTSEQNO）
+ZTSA63F02 | 批量转账 | 批量对外转账，子企业流水号+企业流水号唯一
+ZTSA63Q06 | 批量付款查询 | 查询批量转账明细结果（返回HOSTDT/HOSTSEQNO）
+ZTSA63Q70 | 实时转账银行列表查询 | 获取实时转账支持的银行列表
+ZTSA63Q71 | 普通加急转账银行列表增量变化查询 | 数据量超10万条，建议定时文件手工更新
+--- 聚合接口（2个）---
+ZTSA63M15 | 南海铝业汇总接口 | 票交所业务聚合入口
+ZTSA63M40 | 特约企业对接汇总接口 | 仅限签约企业，内嵌子接口调用
+
+### 三、定活互转（4个）
+ZTSA63F04 | 活期转定期 | 活期转存定期存款
+ZTSA63F05 | 定期转活期 | 定期存款提前支取/到期转活期
+ZTSA63Q31 | 普通定期存款利率查询 | 查询各期限定期利率
+ZTSA63Q32 | 获取账户利息查询 | 查询定期账户利息信息
+
+### 四、电子商业汇票ECDS（30个）
+--- 出票与登记（5个）---
+ZTSA63M18 | 批量票面信息校验 | 校验票面信息
+ZTSA63M19 | 批量票据出票登记接收 | 出票登记
+ZTSA63Q33 | 批量出票批次查询 | 查询出票批次
+ZTSA63Q34 | 批量出票明细查询 | 查询出票明细（TXN_STATUS枚举：4-拒绝、5-撤销为v6.0新增）
+ZTSA63Q35 | 客户票据行为列表查询 | 查询客户票据行为
+--- 承兑与收票（2个）---
+ZTSA63M20 | 提示承兑申请 | 提示承兑
+ZTSA63M21 | 提示收票申请 | 提示收票
+--- 转让与背书（2个）---
+ZTSA63M24 | 背书转让申请 | 背书转让
+ZTSA63M35 | 不可转让撤销 | 撤销不可转让标记
+--- 贴现（3个）---
+ZTSA63M25 | 票据贴现申请 | 票据贴现
+ZTSA63M26 | 贴现凭证查询 | 查询贴现凭证
+ZTSA63M31 | 票据贴现利息计算 | 计算贴现利息
+--- 质押（2个）---
+ZTSA63M27 | 质押申请 | 质押
+ZTSA63M28 | 质押解除申请 | 解除质押
+--- 追索与清偿（2个）---
+ZTSA63M33 | 同意清偿通知申请 | 同意清偿
+ZTSA63M34 | 追索通知申请 | 追索
+--- 保证（1个）---
+ZTSA63M32 | 票据保证 | 票据保证
+--- 付款与签收（3个）---
+ZTSA63M29 | 提示付款申请 | 提示付款
+ZTSA63M30 | 通用签收 | 通用签收
+ZTSA63Q46 | 批量通用签收批次查询 | v6.0新增
+ZTSA63Q47 | 批量通用签收批次明细查询 | v6.0新增
+--- 撤销与退票（2个）---
+ZTSA63M22 | 票据撤销交易申请 | 撤销交易
+ZTSA63M23 | 撤票处理 | 退票处理
+--- 查询与下载（8个）---
+ZTSA63Q36 | 票面信息正面信息查询 | 查询票面正面信息
+ZTSA63Q37 | 票面信息背面信息查询 | 查询票面背面信息
+ZTSA63Q38 | 票据可追索人查询 | 查询可追索人
+ZTSA63Q39 | 票据历史交易信息查询 | 查询历史交易（v6.0新增返回字段：DRAW_DT/BILL_MATURITY_DATE/PAYEE_NAME/RECV_FLG）
+ZTSA63M36 | 贴现凭证生成通知 | 贴现凭证通知
+ZTSA63M37 | 票据影像文件下载 | 下载票据影像
+ZTSA63M38 | 票据信息下载(票面正反面) | 下载票面正反面信息
+
+### 五、银企对账（10个）
+ZTSA63Q30 | 总账户余额对账情况查询 | 查询账户余额对账单（对账方式含3-网上银行对账）
+ZTSA63Q16 | 获取账号类型 | 获取账户类型信息
+ZTSA63Q29 | 总账户签约信息查询 | 查询签约协议信息（对账方式含3-网上银行对账）
+ZTSA63Q17 | 子账户对账情况查询 | 查询未对账的账务明细（v6.0新增返回字段RCVRY_CHN回收渠道）
+ZTSA63Q18 | 账号交易明细查询(含历史) | 含历史的交易明细对账
+ZTSA63M14 | 总账户余额对账结果发送 | 发送余额对账结果
+ZTSA63M12 | 明细对账结果发送 | 发送明细对账结果
+ZTSA63Q19 | 账号未达账结果查询 | 查询尚未对账的结果
+ZTSA63M13 | 银企对账账号未达账发送 | 发送未达账项信息
+ZTSA63M50 | 银企对账单打印 | v6.0新增。对账单打印接口
+
+### 六、电子票据（3个，v5.9新增）
+ZTSA63Q72 | 开票流水查询 | 查询开票流水记录
+ZTSA63M48 | 开票申请 | 提交开票申请
+ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
+
+### 常见响应码
+000000=成功 | 010001=报文格式异常 | 010002=报文内容格式异常 | 010003=报文签名验证失败(U盾签名问题) | 020001=客户号不存在/未签约 | 020002=账号不存在/未签约银企直联
+
+### 下载专区
+接口文档和SDK下载：私有NAS https://web.ugreen.cloud/web/#/share/4bfd0a4053d546fca9a1b3c7df4ec158 提取码SCF4；百度网盘 https://pan.baidu.com/s/13VQmGJJE7jMMWRu_R3dyoA?pwd=HXYH 提取码HXYH；夸克网盘 https://pan.quark.cn/s/7cd2054007f8`;  var chatHistory = [];  // { role: 'user'|'assistant', content: '...' }
+  var isChatting = false;
+
+  function showLoading() {
+    var loading = document.getElementById('qaLoading');
+    if (loading) loading.classList.add('show');
+    var result = document.getElementById('qaResult');
+    if (result) result.classList.remove('show');
+  }
+
+  function hideLoading() {
+    var loading = document.getElementById('qaLoading');
+    if (loading) loading.classList.remove('show');
+  }
+
+  function showResult(title, content, source) {
+    var resultDiv = document.getElementById('qaResult');
+    var titleDiv = document.getElementById('qaTitle');
+    var contentDiv = document.getElementById('qaContent');
+    var sourceDiv = document.getElementById('qaSource');
+    if (!resultDiv || !titleDiv || !contentDiv || !sourceDiv) return;
+    resultDiv.classList.add('show');
+    titleDiv.textContent = title;
+    contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+    sourceDiv.textContent = source || 'AI 智能回答 · DeepSeek';
+  }
+
+  async function doAiChat(query) {
+    if (!query || isChatting) return;
+    isChatting = true;
+    showLoading();
+
+    try {
+      chatHistory.push({ role: 'user', content: query });
+
+      var messages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: '重要提示：你只能基于以上知识库内容和你的常识回答，绝对不要进行联网搜索。如果知识库没有覆盖的问题，可以结合你的常识给出建议，但不要编造银企直联系统的具体接口或功能。' }
+      ];
+      // Add last 6 exchanges (12 messages) for context
+      var recentHistory = chatHistory.slice(-12);
+      messages = messages.concat(recentHistory);
+
+      var resp = await fetch(SCF_PROXY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: messages,
+          temperature: 0.3,
+          max_tokens: 2000
+        })
+      });
+
+      var data = await resp.json();
+
+      if (data.error) {
+        showResult('请求失败', '抱歉，AI 服务暂时不可用：' + (data.error.message || JSON.stringify(data.error)) + '\n\n请稍后重试，或查看「常见问题」栏目获取帮助。', '');
+      } else {
+        var reply = data.choices?.[0]?.message?.content || '未能获取有效回复';
+        chatHistory.push({ role: 'assistant', content: reply });
+        if (chatHistory.length > 12) chatHistory = chatHistory.slice(-12);
+
+        showResult('AI 回答', reply, 'AI 智能回答 · DeepSeek');
+      }
+    } catch (err) {
+      console.error('Chat error:', err);
+      showResult('网络错误', '请求失败，请检查网络连接后重试。\n\n错误详情：' + err.message + '\n\n如持续失败，请查看「常见问题」栏目或联系对接群。', '');
+    } finally {
+      hideLoading();
+      isChatting = false;
+    }
+  }
+
+  function handleQaSubmit() {
+    var inputEl = document.getElementById('qaInput');
+    if (!inputEl) return;
+    var query = inputEl.value.trim();
+    if (!query) return;
+    inputEl.value = '';
+    doAiChat(query);
+  }
+
+  function quickAsk(question) {
+    var inputEl = document.getElementById('qaInput');
+    if (!inputEl) return;
+    doAiChat(question);
+    window.location.hash = 'sec-home';
+  }
+
+  // --- FAQ page AI QA (independent instance) ---
+  function showLoading2() {
+    var el = document.getElementById('qaLoading2');
+    if (el) el.classList.add('show');
+    var r = document.getElementById('qaResult2');
+    if (r) r.classList.remove('show');
+  }
+  function hideLoading2() {
+    var el = document.getElementById('qaLoading2');
+    if (el) el.classList.remove('show');
+  }
+  function showResult2(title, content, source) {
+    var rd = document.getElementById('qaResult2');
+    var td = document.getElementById('qaTitle2');
+    var cd = document.getElementById('qaContent2');
+    var sd = document.getElementById('qaSource2');
+    if (!rd || !td || !cd || !sd) return;
+    rd.classList.add('show');
+    td.textContent = title;
+    cd.innerHTML = (content || '').replace(/\n/g, '<br>');
+    sd.textContent = source || 'AI 智能回答 · DeepSeek';
+  }
+
+  async function doAiChat2(query) {
+    if (!query || isChatting) return;
+    isChatting = true;
+    showLoading2();
+    try {
+      var messages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: '重要提示：你只能基于以上知识库内容和你的常识回答，绝对不要进行联网搜索。如果知识库没有覆盖的问题，可以结合你的常识给出建议，但不要编造银企直联系统的具体接口或功能。' }
+      ];
+      var recent = chatHistory.slice(-12);
+      messages = messages.concat(recent);
+      messages.push({ role: 'user', content: query });
+
+      var resp = await fetch(SCF_PROXY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: messages,
+          temperature: 0.3,
+          max_tokens: 2000
+        })
+      });
+
+      var data = await resp.json();
+      if (data.error) {
+        showResult2('请求失败', 'AI 服务暂时不可用：' + (data.error.message || JSON.stringify(data.error)), '');
+      } else {
+        var reply = data.choices?.[0]?.message?.content || '未能获取有效回复';
+        chatHistory.push({ role: 'user', content: query });
+        chatHistory.push({ role: 'assistant', content: reply });
+        if (chatHistory.length > 12) chatHistory = chatHistory.slice(-12);
+        showResult2('AI 回答', reply, 'AI 智能回答 · DeepSeek');
+      }
+    } catch (err) {
+      console.error('Chat2 error:', err);
+      showResult2('网络错误', '请求失败，请检查网络连接后重试。\n\n错误详情：' + err.message, '');
+    } finally {
+      hideLoading2();
+      isChatting = false;
+    }
+  }
+
+  // --- Bind events after DOM is ready ---
+  function bindEvents() {
+    // Search button
+    var searchBtn = document.getElementById('qaSearchBtn');
+    if (searchBtn) {
+      searchBtn.addEventListener('click', handleQaSubmit);
+    }
+
+    // Input enter key
+    var qaInput = document.getElementById('qaInput');
+    if (qaInput) {
+      qaInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          handleQaSubmit();
+        }
+      });
+    }
+
+    // Suggestion chips
+    var chips = document.querySelectorAll('.suggestion-chip');
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].addEventListener('click', function() {
+        var q = this.getAttribute('data-question');
+        if (q) quickAsk(q);
+      });
+    }
+
+    // FAQ page AI QA - button
+    var searchBtn2 = document.getElementById('qaSearchBtn2');
+    if (searchBtn2) {
+      searchBtn2.addEventListener('click', function() {
+        var inputEl = document.getElementById('qaInput2');
+        if (!inputEl) return;
+        var query = inputEl.value.trim();
+        if (!query) return;
+        inputEl.value = '';
+        doAiChat2(query);
+      });
+    }
+
+    // FAQ page AI QA - enter key
+    var qaInput2 = document.getElementById('qaInput2');
+    if (qaInput2) {
+      qaInput2.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          var query = qaInput2.value.trim();
+          if (!query) return;
+          qaInput2.value = '';
+          doAiChat2(query);
+        }
+      });
+    }
+
+    // FAQ page suggestion chips
+    var chips2 = document.querySelectorAll('.suggestion-chip-2');
+    for (var j = 0; j < chips2.length; j++) {
+      chips2[j].addEventListener('click', function() {
+        var q = this.getAttribute('data-question');
+        if (q) doAiChat2(q);
+      });
+    }
+
+    // Download overlay close
+    var dlClose = document.getElementById('dlOverlayClose');
+    var dlOverlay = document.getElementById('dlOverlay');
+    if (dlClose && dlOverlay) {
+      dlClose.addEventListener('click', function() {
+        dlOverlay.classList.remove('show');
+      });
+      dlOverlay.addEventListener('click', function(e) {
+        if (e.target === dlOverlay) dlOverlay.classList.remove('show');
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindEvents);
+  } else {
+    bindEvents();
+  }
+})();
+</script>
+</body>
+</html>
