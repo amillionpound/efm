@@ -471,7 +471,7 @@
   <div class="bank-name">广东华兴银行</div>
   <h1>银企直联接入指引</h1>
   <div class="subtitle">企业前置程序 · 安装指引 · 常见问题</div>
-  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260615-1243</div>
+  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260618-0909</div>
 </div>
 
 <!-- Navigation - using anchor links for maximum reliability -->
@@ -1359,7 +1359,10 @@ sender.close();</div>
   highlightNav();
 
   // --- AI Chat: 通过 SCF 云函数代理调用 DeepSeek API（Key 保护在服务端环境变量） ---
-  var SCF_PROXY_URL = 'https://1256784020-e0oiiqytiv.ap-guangzhou.tencentscf.com';
+  // 自动检测来源：SCF上同域调用（零跨域），GitHub Pages上用硬编码地址
+  var SCF_PROXY_URL = (window.location.hostname.indexOf('tencentscf.com') >= 0)
+    ? window.location.origin
+    : 'https://1256784020-e0oiiqytiv.ap-guangzhou.tencentscf.com';
   var SYSTEM_PROMPT = `你是银企直联系统的智能客服助手，专门为企业客户解答银企直联接入和使用的各类问题。
 
 ## 你的原则
