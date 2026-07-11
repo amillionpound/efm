@@ -498,7 +498,7 @@
   <div class="bank-name">广东华兴银行</div>
   <h1>银企直联接入指引</h1>
   <div class="subtitle">企业前置程序 · 安装指引 · 常见问题</div>
-  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260630-0930</div>
+  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260711-2230</div>
 </div>
 
 <!-- Navigation - using anchor links for maximum reliability -->
@@ -2117,6 +2117,50 @@ ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeLightbox();
   });
+
+  // ==================== 访问统计埋点 ====================
+  (function() {
+    var trackUrl = (window.location.hostname.indexOf('tencentscf.com') >= 0)
+      ? window.location.origin + '/track'
+      : 'https://1256784020-e0oiiqytiv.ap-guangzhou.tencentscf.com/track';
+
+    // 访客ID（localStorage 持久化）
+    var vid = localStorage.getItem('kb_vid');
+    if (!vid) {
+      vid = 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      localStorage.setItem('kb_vid', vid);
+    }
+
+    // 来源识别
+    var host = window.location.hostname;
+    var src = 'other';
+    if (host.indexOf('codebuddy.work') >= 0) src = 'cloudstudio';
+    else if (host.indexOf('github.io') >= 0) src = 'github';
+    else if (host.indexOf('tencentscf.com') >= 0) src = 'scf';
+
+    function track(type, tab) {
+      var payload = JSON.stringify({ type: type, tab: tab || '', source: src, visitor_id: vid });
+      try {
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(trackUrl, payload);
+        } else {
+          var x = new XMLHttpRequest();
+          x.open('POST', trackUrl, true);
+          x.setRequestHeader('Content-Type', 'text/plain');
+          x.send(payload);
+        }
+      } catch(e) { /* 静默失败 */ }
+    }
+
+    // 页面加载上报
+    track('page_view', '');
+
+    // tab 切换上报
+    window.addEventListener('hashchange', function() {
+      var tab = (window.location.hash || '#sec-home').replace('#sec-', '');
+      track('tab_view', tab);
+    });
+  })();
 
   </script>
   <!-- Lightbox -->
