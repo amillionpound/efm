@@ -495,10 +495,10 @@
 
 <!-- Header -->
 <div class="header">
-  <div class="bank-name">广东华兴银行</div>
-  <h1>银企直联接入指引</h1>
-  <div class="subtitle">企业前置程序 · 安装指引 · 常见问题</div>
-  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260711-2230</div>
+  <div class="bank-name" id="bank-name">广东华兴银行</div>
+  <h1 id="page-title">银企直联接入指引</h1>
+  <div class="subtitle" id="page-subtitle">企业前置程序 · 安装指引 · 常见问题</div>
+  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260711-2335</div>
 </div>
 
 <!-- Navigation - using anchor links for maximum reliability -->
@@ -517,7 +517,7 @@
   <!-- ==================== 快速开始 ==================== -->
   <section class="section default" id="sec-home">
 
-    <div class="card">
+    <div class="card" id="home-guide-card">
       <h2 style="font-size:18px;margin-bottom:12px;">使用指南</h2>
       <p style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;">
         本指引为银企直联系统的客户自助服务平台。您可以：
@@ -2073,12 +2073,14 @@ ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
     }
   }
 
-  // 动态加载 NAS 下载配置（从 SCF 环境变量读取）
-  async function loadNasConfig() {
+  // 动态加载应用配置（从 SCF 环境变量读取：NAS链接、首页标题+使用指南）
+  async function loadAppConfig() {
     try {
       var resp = await fetch(SCF_PROXY_URL + '/config');
       if (!resp.ok) return;
       var config = await resp.json();
+
+      // 1. NAS 下载链接
       if (config.nas_url) {
         var nasLink = document.getElementById('nas-link');
         if (nasLink) nasLink.href = config.nas_url;
@@ -2087,9 +2089,62 @@ ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
         var nasCode = document.getElementById('nas-code');
         if (nasCode) nasCode.textContent = '提取码：' + config.nas_code;
       }
+
+      // 2. 首页配置（标题、副标题、使用指南，统一由 HOME_CONFIG_JSON 控制）
+      var hc = config.home_config;
+      if (hc && typeof hc === 'object') {
+        // 银行名称
+        if (hc.bank_name) {
+          var bn = document.getElementById('bank-name');
+          if (bn) bn.textContent = hc.bank_name;
+        }
+        // 主标题
+        if (hc.title) {
+          var t = document.getElementById('page-title');
+          if (t) t.textContent = hc.title;
+        }
+        // 副标题
+        if (hc.subtitle) {
+          var st = document.getElementById('page-subtitle');
+          if (st) st.textContent = hc.subtitle;
+        }
+        // 使用指南卡片
+        if (hc.guide && typeof hc.guide === 'object') {
+          var guide = hc.guide;
+          var card = document.getElementById('home-guide-card');
+          if (card) {
+            var html = '';
+            if (guide.title) {
+              html += '<h2 style="font-size:18px;margin-bottom:12px;">' +
+                      escapeHtml(guide.title) + '</h2>';
+            }
+            if (guide.intro) {
+              html += '<p style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;">' +
+                      escapeHtml(guide.intro) + '</p>';
+            }
+            if (Array.isArray(guide.items) && guide.items.length) {
+              html += '<ul style="padding-left:20px;font-size:14px;color:var(--text-secondary);">';
+              guide.items.forEach(function(it) {
+                html += '<li><strong>' + escapeHtml(it.name || '') + '</strong> — ' +
+                        escapeHtml(it.desc || '') + '</li>';
+              });
+              html += '</ul>';
+            }
+            card.innerHTML = html;
+          }
+        }
+      }
     } catch (e) { /* 静默失败，保留默认状态 */ }
   }
-  loadNasConfig();
+
+  // 简单 HTML 转义，防止环境变量内容含特殊字符破坏页面
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
+  loadAppConfig();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindEvents);
