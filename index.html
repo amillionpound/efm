@@ -498,7 +498,7 @@
   <div class="bank-name" id="bank-name">广东华兴银行</div>
   <h1 id="page-title">银企直联接入指引</h1>
   <div class="subtitle" id="page-subtitle">企业前置程序 · 安装指引 · 常见问题</div>
-  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260711-2335</div>
+  <div style="font-size:10px;opacity:0.5;margin-top:2px;">v20260712-0955</div>
 </div>
 
 <!-- Navigation - using anchor links for maximum reliability -->
@@ -1831,7 +1831,9 @@ ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
 000000=成功 | 010001=报文格式异常 | 010002=报文内容格式异常 | 010003=报文签名验证失败(U盾签名问题) | 020001=客户号不存在/未签约 | 020002=账号不存在/未签约银企直联
 
 ### 下载专区
-接口文档和SDK下载：私有NAS https://web.ugreen.cloud/web/#/share/4bfd0a4053d546fca9a1b3c7df4ec158 提取码SCF4；百度网盘 https://pan.baidu.com/s/13VQmGJJE7jMMWRu_R3dyoA?pwd=HXYH 提取码HXYH；夸克网盘 https://pan.quark.cn/s/7cd2054007f8`;  var chatHistory = [];  // { role: 'user'|'assistant', content: '...' }
+接口文档和SDK下载：私有NAS https://web.ugreen.cloud/web/#/share/4bfd0a4053d546fca9a1b3c7df4ec158 提取码SCF4；百度网盘 https://pan.baidu.com/s/13VQmGJJE7jMMWRu_R3dyoA?pwd=HXYH 提取码HXYH；夸克网盘 https://pan.quark.cn/s/7cd2054007f8`;
+  var AI_EXTRA_CONTEXT = '';  // 从 SCF 环境变量动态加载，拼接在 SYSTEM_PROMPT 之后（冲突时以此为准）
+  var chatHistory = [];  // { role: 'user'|'assistant', content: '...' }
   var isChatting = false;
 
   function showLoading() {
@@ -1872,6 +1874,10 @@ ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'system', content: '重要提示：你只能基于以上知识库内容和你的常识回答，绝对不要进行联网搜索。如果知识库没有覆盖的问题，可以结合你的常识给出建议，但不要编造银企直联系统的具体接口或功能。' }
       ];
+      // 追加环境变量补充内容（冲突时以此为准）
+      if (AI_EXTRA_CONTEXT) {
+        messages.push({ role: 'system', content: '以下为最新补充内容，如与前面知识库有冲突，以本段为准：\n' + AI_EXTRA_CONTEXT });
+      }
       // Add last 6 exchanges (12 messages) for context
       var recentHistory = chatHistory.slice(-12);
       messages = messages.concat(recentHistory);
@@ -1960,6 +1966,10 @@ ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'system', content: '重要提示：你只能基于以上知识库内容和你的常识回答，绝对不要进行联网搜索。如果知识库没有覆盖的问题，可以结合你的常识给出建议，但不要编造银企直联系统的具体接口或功能。' }
       ];
+      // 追加环境变量补充内容（冲突时以此为准）
+      if (AI_EXTRA_CONTEXT) {
+        messages.push({ role: 'system', content: '以下为最新补充内容，如与前面知识库有冲突，以本段为准：\n' + AI_EXTRA_CONTEXT });
+      }
       var recent = chatHistory.slice(-12);
       messages = messages.concat(recent);
       messages.push({ role: 'user', content: query });
@@ -2134,6 +2144,11 @@ ZTSA63Q73 | 开票结果查询 | 查询开票申请的处理结果
           }
         }
       }
+      // 3. AI 补充知识库内容（环境变量 AI_EXTRA_CONTEXT，冲突时以此为准）
+      if (config.ai_extra_context) {
+        AI_EXTRA_CONTEXT = config.ai_extra_context;
+      }
+
     } catch (e) { /* 静默失败，保留默认状态 */ }
   }
 
